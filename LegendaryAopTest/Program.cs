@@ -1,7 +1,8 @@
 ﻿using LegendaryAop;
-using System.Reflection;
 
-new MyClassAop().Bark();
+var my = new MyClassAop();
+my.Bark();
+Task.Run(my.BarkAsync).Wait();
 
 public class LogAttribute : AsyncAopAttribute
 {
@@ -41,5 +42,18 @@ public class MyClassAop
     {
         
         Console.WriteLine("bark!");
+    }
+    public async Task BarkAsync()
+    {
+        await barkTask();
+    }
+
+    private Task barkTask()
+    {
+        return Task.Run(() =>
+        {
+            Thread.Sleep(1000);
+            Console.WriteLine("barkasync!");
+        });
     }
 }
