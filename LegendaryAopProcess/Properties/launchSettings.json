@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LegendaryAopProcess": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\proj\\LegendaryAop\\LegendaryAopTest\\bin\\Debug\\net8.0\\LegendaryAopTest.dll"
+    }
+  }
+}
