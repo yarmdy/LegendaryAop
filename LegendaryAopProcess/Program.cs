@@ -3,11 +3,17 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Reflection;
 
+const string _prefix_ = "LegendaryAopTemp_";
 if (args.Length < 1)
 {
     return;
 }
 var fileInfo = new FileInfo(args[0]);
+if (Directory.Exists(fileInfo.FullName))
+{
+    rename(new DirectoryInfo(fileInfo.FullName));
+    return;
+}
 if (!fileInfo.Exists)
 {
     return;
@@ -57,7 +63,7 @@ var assNames = assembly.GetReferencedAssemblies()
     {
         var ass = a.First();
         var fileInfo = new FileInfo(ass.Location);
-        var newFileInfo = new FileInfo(Path.Combine(fileInfo.DirectoryName!, $"LegendaryAopTemp_{fileInfo.Name}"));
+        var newFileInfo = new FileInfo(Path.Combine(fileInfo.DirectoryName!, $"{_prefix_}{fileInfo.Name}"));
         if (newFileInfo.Exists)
         {
             newFileInfo.Delete();
@@ -66,3 +72,17 @@ var assNames = assembly.GetReferencedAssemblies()
         return a.Key;
     }).ToList();
 return;
+
+
+void rename(DirectoryInfo dir)
+{
+    dir.GetFiles(_prefix_ + "*.dll").AsParallel().ForAll(a =>
+    {
+        var newFile = new FileInfo(Path.Combine(a.DirectoryName!, a.Name.Substring(_prefix_.Length)));
+        if (newFile.Exists)
+        {
+            newFile.Delete();
+        }
+        a.MoveTo(newFile.FullName,true);
+    });
+}
