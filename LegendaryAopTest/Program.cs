@@ -1,4 +1,5 @@
 ﻿using LegendaryAop;
+using System.Reflection;
 
 new MyClassAop().Bark();
 
@@ -38,6 +39,7 @@ public class MyClassAop
     [Log(0)]
     public void Bark()
     {
+        
         Console.WriteLine("bark!");
     }
 }
