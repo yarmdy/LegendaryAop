@@ -1,4 +1,5 @@
 ﻿using LegendaryAop;
+using System.Diagnostics;
 
 var my = new MyClassAop();
 DefaultAopExecutor executor = new DefaultAopExecutor();
@@ -7,6 +8,23 @@ Console.WriteLine(str);
 //my.Bark();
 //Task.Run(my.BarkAsync).Wait();
 
+public class XingnengAttribute : AsyncAopAttribute
+{
+    public XingnengAttribute(int sort = 9999) : base(sort)
+    {
+
+    }
+    public override string Name => "性能";
+    public override async Task<object?> InvokeAsync(IAopMetaData data)
+    {
+        Console.WriteLine($"【{data.Method.DeclaringType?.Name??""}.{data.Method.Name}】：{DateTime.Now}：性能检测开始");
+        Stopwatch sw = Stopwatch.StartNew();
+        var result = await data.NextAsync();
+        sw.Stop();
+        Console.WriteLine($"【{data.Method.DeclaringType?.Name ?? ""}.{data.Method.Name}】：{DateTime.Now}：性能检测结束，运行了{sw.ElapsedMilliseconds}ms");
+        return result;
+    }
+}
 public class LogAttribute : AsyncAopAttribute
 {
     public LogAttribute(int sort = 0) : base(sort)
@@ -44,6 +62,7 @@ public class FilterAttribute : AsyncAopAttribute
 }
 public class MyClassAop
 {
+    [Xingneng]
     [Filter(0)]
     [Log(0)]
     public string Bark(int i)
