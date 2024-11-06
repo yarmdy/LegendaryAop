@@ -8,6 +8,6 @@
         }
         public abstract string Name { get; }
         public virtual int Sort { get; }
-        public abstract Task<object> InvokeAsync(IAopMetaData data);
+        public abstract Task<object?> InvokeAsync(IAopMetaData data);
     }
 }

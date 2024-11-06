@@ -4,6 +4,6 @@
     {
         string Name { get; }
         int Sort { get; }
-        Task<object> InvokeAsync(IAopMetaData data);
+        Task<object?> InvokeAsync(IAopMetaData data);
     }
 }

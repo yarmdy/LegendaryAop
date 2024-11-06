@@ -11,7 +11,7 @@ public class LogAttribute : AsyncAopAttribute
 
     }
     public override string Name => "日志";
-    public override async Task<object> InvokeAsync(IAopMetaData data)
+    public override async Task<object?> InvokeAsync(IAopMetaData data)
     {
         Console.WriteLine("日志开始");
         var result = await data.NextAsync();
@@ -26,7 +26,7 @@ public class FilterAttribute : AsyncAopAttribute
 
     }
     public override string Name => "过滤";
-    public override async Task<object> InvokeAsync(IAopMetaData data)
+    public override async Task<object?> InvokeAsync(IAopMetaData data)
     {
         Console.WriteLine("过滤开始");
         var result = await data.NextAsync();

@@ -13,9 +13,9 @@ namespace LegendaryAop
         }
         public object[] Parameters { get; set; }
 
-        public Task<object> NextAsync()
+        public Task<object?> NextAsync()
         {
-            return (Task<object>)_method.DynamicInvoke(Parameters)!;
+            return (Task<object?>)_method.DynamicInvoke(Parameters)!;
         }
     }
 }
