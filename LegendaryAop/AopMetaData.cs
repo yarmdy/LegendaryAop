@@ -5,17 +5,20 @@ namespace LegendaryAop
 {
     internal class AopMetaData : IAopMetaData
     {
-        internal Delegate _method;
-        public AopMetaData(Delegate method, object[] parameters)
+        private Func<object[], Task<object?>> _next;
+        public AopMetaData(MethodBase method,Func<object[], Task<object?>> next, object[] parameters)
         {
-            _method = method;
+            Method = method;
+            _next = next;
             Parameters = parameters;
         }
         public object[] Parameters { get; set; }
 
+        public MethodBase Method { get; init;}
+
         public Task<object?> NextAsync()
         {
-            return (Task<object?>)_method.DynamicInvoke(Parameters)!;
+            return _next(Parameters);
         }
     }
 }

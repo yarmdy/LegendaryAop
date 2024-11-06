@@ -13,7 +13,9 @@ namespace LegendaryAop
         private static ConcurrentDictionary<MethodBase, Func<object[], Task<object?>>> _cacheFunc = new();
         public T? Exec<T>(object? obj, MethodBase method, params object[] parameters)
         {
-            var result = Task.Run(async ()=>await ExecAsync<T>(obj,method,parameters)).Result;
+            var result = Task.Run(async () => {
+                return await ExecAsync<T>(obj, method, parameters);
+            }).Result;
             if (result == null)
             {
                 return default;
@@ -42,20 +44,20 @@ namespace LegendaryAop
         {
             Func<object[], Task<object?>> func = data =>
             {
-                var ret = method.Invoke(null,parameters);
+                var ret = method.Invoke(obj,parameters);
                 return Task.FromResult(ret);
             };
             foreach (var aop in method.GetCustomAttributes<AsyncAopAttribute>().Select((a, i) => new { aop = a, index = i }).OrderByDescending(a => a.aop.Sort).ThenByDescending(a => a.index).Select(a => a.aop))
             {
-                func = addFunc(func,aop);
+                func = addFunc(method, func,aop);
             }
             return func;
         }
 
-        private Func<object[], Task<object?>> addFunc(Func<object[], Task<object?>>  func,AsyncAopAttribute aop)
+        private Func<object[], Task<object?>> addFunc(MethodBase method ,Func<object[], Task<object?>>  func,AsyncAopAttribute aop)
         {
             return parameters => {
-                return aop.InvokeAsync(new AopMetaData(func,parameters));
+                return aop.InvokeAsync(new AopMetaData(method,func, parameters));
             };
         }
     }

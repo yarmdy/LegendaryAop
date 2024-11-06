@@ -1,8 +1,11 @@
 ﻿using LegendaryAop;
 
 var my = new MyClassAop();
-my.Bark();
-Task.Run(my.BarkAsync).Wait();
+DefaultAopExecutor executor = new DefaultAopExecutor();
+var str = executor.Exec<string>(my, my.GetType().GetMethod("Bark")!,0);
+Console.WriteLine(str);
+//my.Bark();
+//Task.Run(my.BarkAsync).Wait();
 
 public class LogAttribute : AsyncAopAttribute
 {
@@ -28,7 +31,12 @@ public class FilterAttribute : AsyncAopAttribute
     public override string Name => "过滤";
     public override async Task<object?> InvokeAsync(IAopMetaData data)
     {
-        Console.WriteLine("过滤开始");
+        Console.WriteLine($"过滤开始{data.Parameters[0]}");
+        if (data.Parameters[0].Equals(1))
+        {
+            Console.WriteLine("过滤中断");
+            return await Task.FromResult("你好");
+        }
         var result = await data.NextAsync();
         Console.WriteLine("过滤结束");
         return result;
@@ -38,10 +46,11 @@ public class MyClassAop
 {
     [Filter(0)]
     [Log(0)]
-    public void Bark()
+    public string Bark(int i)
     {
-        
-        Console.WriteLine("bark!");
+        var str = $"bark!{i}";
+        Console.WriteLine(str);
+        return str;
     }
     public async Task BarkAsync()
     {
