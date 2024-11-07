@@ -1,7 +1,7 @@
 ﻿using LegendaryAop;
 using System.Diagnostics;
 
-new MyClassAop().Bark(4);
+await new MyClassAop().BarkAsync(4);
 
 public class XingnengAttribute : AsyncAopAttribute
 {
@@ -30,8 +30,12 @@ public class LogAttribute : AsyncAopAttribute
     public override async Task<object?> InvokeAsync(IAopMetaData data)
     {
         Console.WriteLine("日志开始");
+        await Task.Delay(1000);
+        Console.WriteLine("日志记录成功");
         var result = await data.NextAsync();
-        Console.WriteLine("日志结束");
+        Console.WriteLine("开始后日志");
+        await Task.Delay(1000);
+        Console.WriteLine("后日志记录成功");
         return result;
     }
 }
@@ -50,8 +54,12 @@ public class FilterAttribute : AsyncAopAttribute
             Console.WriteLine("过滤中断");
             return await Task.FromResult("你好");
         }
+        await Task.Delay(1000);
+        Console.WriteLine("过滤完成");
         var result = await data.NextAsync();
-        Console.WriteLine("过滤结束");
+        Console.WriteLine("后过滤");
+        await Task.Delay(1000);
+        Console.WriteLine("后过滤完成");
         return result;
     }
 }
@@ -75,11 +83,13 @@ public class MyClassAop
     [Log(0)]
     public async Task<string> BarkAsync(int i)
     {
+        Console.WriteLine("我是异步方法主体，开始");
         await barkTask();
         if (i == 4)
         {
             Console.WriteLine("4");
         }
+        Console.WriteLine("我是异步方法主体，结束");
         return "BarkAsync";
     }
     [Xingneng]
