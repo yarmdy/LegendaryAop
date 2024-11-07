@@ -3,9 +3,9 @@ using System.Diagnostics;
 
 var my = new MyClassAop();
 DefaultAopExecutor executor = new DefaultAopExecutor();
-//var str = await executor.ExecAsync<object>(my.BarkAsync,0);
-await executor.ExecAsync(my.BarkAsync,0);
-//Console.WriteLine(str);
+var str = await executor.ExecAsync<string>(my.VoidAsync);
+
+Console.WriteLine(str);
 //my.Bark();
 //Task.Run(my.BarkAsync).Wait();
 
@@ -75,15 +75,23 @@ public class MyClassAop
     [Xingneng]
     [Filter(0)]
     [Log(0)]
-    public async Task BarkAsync(int i)
+    public async Task<string> BarkAsync(int i)
     {
         await barkTask();
+        return "BarkAsync";
     }
     [Xingneng]
     [Log(0)]
     public void Void() {
         Console.WriteLine("Void!");
     }
+    [Xingneng]
+    [Log(0)]
+    public async Task VoidAsync() {
+        Console.WriteLine("Void!");
+        await Task.CompletedTask;
+    }
+
     private Task barkTask()
     {
         return Task.Run(() =>

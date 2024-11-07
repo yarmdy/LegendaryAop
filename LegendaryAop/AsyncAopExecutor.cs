@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LegendaryAop
 {
     public class DefaultAopExecutor : IAsyncAopExecutor, IAopExecutor, IVoidAopExecutor, IAsyncVoidAopExecutor
     {
-        private static ConcurrentDictionary<MethodInfo, Func<object[], Task<object?>>> _cacheFunc = new();
+        private static ConcurrentDictionary<MethodInfo, Func<object?, object[], Task<object?>>> _cacheFunc = new();
         public T? Exec<T>(Delegate method, params object[] parameters)
         {
             var result = Task.Run(async () => await ExecAsync<T>(method, parameters)).Result;
@@ -28,9 +23,9 @@ namespace LegendaryAop
 
         public Task<T?> ExecAsync<T>(Delegate method, params object[] parameters)
         {
-            var func = _cacheFunc.GetOrAdd(method.Method, a => createFunc(method.Target,method.Method,parameters));
+            var func = _cacheFunc.GetOrAdd(method.Method, createFunc);
             return Task.Run(async () => {
-                var result = await func(parameters);
+                var result = await func(method.Target,parameters);
                 if (result == null)
                 {
                     return default;
@@ -38,11 +33,11 @@ namespace LegendaryAop
                 return (T)result;
             });
         }
-        private Func<object[], Task<object?>> createFunc(object? obj, MethodInfo method, params object[] parameters)
+        private Func<object?, object[], Task<object?>> createFunc(MethodInfo method)
         {
-            Func<object[], Task<object?>> func = data =>
+            Func<object?, object[], Task<object?>> func = (obj,data) =>
             {
-                var ret = method.Invoke(obj,parameters);
+                var ret = method.Invoke(obj, data);
                 if(ret is not Task task)
                 {
                     return Task.FromResult(ret);
@@ -51,7 +46,7 @@ namespace LegendaryAop
                 return Task.Run(async () =>
                 {
                     await task;
-                    if(!method.ReturnType.IsGenericParameter)
+                    if(!method.ReturnType.IsConstructedGenericType)
                     {
                         return null;
                     }
@@ -65,10 +60,10 @@ namespace LegendaryAop
             return func;
         }
 
-        private Func<object[], Task<object?>> addFunc(MethodInfo method ,Func<object[], Task<object?>>  func,AsyncAopAttribute aop)
+        private Func<object?, object[], Task<object?>> addFunc(MethodInfo method ,Func<object?, object[], Task<object?>>  func,AsyncAopAttribute aop)
         {
-            return parameters => {
-                return aop.InvokeAsync(new AopMetaData(method,func, parameters));
+            return (obj,parameters) => {
+                return aop.InvokeAsync(new AopMetaData(method,obj,func, parameters));
             };
         }
 
