@@ -142,19 +142,41 @@ void processMethod(MethodDefinition originalMethod,MethodInfo method)
         funcType = funcType.MakeGenericType(paramTypes.ToArray());
     }
     var funcRef = originalMethod.Module.ImportReference(funcType);
-    var funcCon = originalMethod.Module.ImportReference(funcType.GetConstructors().First());
+    var funcCon = originalMethod.Module.ImportReference(funcType.GetConstructor([typeof(object), typeof(nint)]));
     var objRef = originalMethod.Module.ImportReference(typeof(object));
 
     ilp.Append(ilp.Create(OpCodes.Newobj,execCon));
+    if (originalMethod.IsStatic)
+    {
+        ilp.Append(ilp.Create(OpCodes.Ldnull));
+    }
+    else
+    {
+        ilp.Append(ilp.Create(OpCodes.Ldarg_0));
+    }
+    
     ilp.Append(ilp.Create(OpCodes.Ldftn,clonedMethod));
     ilp.Append(ilp.Create(OpCodes.Newobj, funcCon));
-
     
     //for (int i = method.IsStatic?0:1; i < argCount; i++) {
     //    ilp.Append(ilp.Create(OpCodes.Ldarg, i));
     //}
     ilp.Append(ilp.Create(OpCodes.Ldc_I4, argCount));
     ilp.Append(ilp.Create(OpCodes.Newarr, objRef));
+
+    for (int i = 0; i < argCount; i++)
+    {
+        var p = originalMethod.Parameters[i];
+        ilp.Append(ilp.Create(OpCodes.Dup));
+        ilp.Append(ilp.Create(OpCodes.Ldc_I4, i));
+        ilp.Append(ilp.Create(OpCodes.Ldarg, originalMethod.IsStatic? i: i+1));
+        if (p.ParameterType.IsValueType) {
+            ilp.Append(ilp.Create(OpCodes.Box,p.ParameterType));
+        }
+        ilp.Append(ilp.Create(OpCodes.Stelem_Ref));
+    }
+
+
 
     ilp.Append(ilp.Create(OpCodes.Call, exec));
     ilp.Append(ilp.Create(OpCodes.Ret));

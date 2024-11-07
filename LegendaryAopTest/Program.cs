@@ -1,13 +1,7 @@
 ﻿using LegendaryAop;
 using System.Diagnostics;
 
-var my = new MyClassAop();
-DefaultAopExecutor executor = new DefaultAopExecutor();
-executor.Exec<string>(my.Bark,0);
-//var str = await executor.ExecAsync<string>(my.BarkAsync,0);
-//Console.WriteLine(str);
-//my.Bark();
-//Task.Run(my.BarkAsync).Wait();
+await new MyClassAop().BarkAsync(4);
 
 public class XingnengAttribute : AsyncAopAttribute
 {
@@ -99,5 +93,16 @@ public class MyClassAop
             Thread.Sleep(1000);
             Console.WriteLine("barkasync!");
         });
+    }
+
+    public static string Barks(int i)
+    {
+        var str = $"bark!{i}";
+        Console.WriteLine(str);
+        return str;
+    }
+    public static string Bark2(int i)
+    {
+        return new DefaultAopExecutor().Exec<string>(Barks, i)!;
     }
 }
