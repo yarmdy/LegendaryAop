@@ -9,6 +9,6 @@ namespace LegendaryAop
 {
     public interface IVoidAopExecutor
     {
-        void Exec(object? obj, MethodBase method,params object[] parameters);
+        void Exec(Delegate method,params object[] parameters);
     }
 }

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace LegendaryAop
 {
-    public interface IAopExecutor
+    public interface IAsyncVoidAopExecutor
     {
-        T? Exec<T>(Delegate method, params object[] parameters);
+        Task ExecAsync(Delegate method, params object[] parameters);
     }
 }
