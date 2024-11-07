@@ -3,9 +3,9 @@ using System.Diagnostics;
 
 var my = new MyClassAop();
 DefaultAopExecutor executor = new DefaultAopExecutor();
-var str = await executor.ExecAsync<string>(my.BarkAsync,0);
-
-Console.WriteLine(str);
+executor.Exec<string>((Delegate)my.Bark,0);
+//var str = await executor.ExecAsync<string>(my.BarkAsync,0);
+//Console.WriteLine(str);
 //my.Bark();
 //Task.Run(my.BarkAsync).Wait();
 
