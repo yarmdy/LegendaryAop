@@ -89,6 +89,11 @@ void processMethod(MethodDefinition originalMethod,MethodInfo method)
         //foreach()
     }
 
+    foreach(var seq in originalMethod.DebugInformation.SequencePoints)
+    {
+        clonedMethod.DebugInformation.SequencePoints.Add(seq);
+    }
+
     // 克隆原始方法的特性
     foreach (var attribute in originalMethod.CustomAttributes)
     {
@@ -186,8 +191,9 @@ void processMethod(MethodDefinition originalMethod,MethodInfo method)
 
     ilp.Append(ilp.Create(OpCodes.Call, exec));
     ilp.Append(ilp.Create(OpCodes.Ret));
-    
 
+
+    originalMethod.DebugInformation.SequencePoints.Clear();
     originalMethod.DeclaringType.Methods.Add(clonedMethod);
 }
 void rename(DirectoryInfo dir)
