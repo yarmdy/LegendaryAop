@@ -8,7 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LegendaryAop\LegendaryAop.csproj" />
+    <ProjectReference Include="..\LegendaryAopProcess\LegendaryAopProcess.csproj" />
   </ItemGroup>
-
+	<Target Name="aop" AfterTargets="Build">
+		<Message Text="Command: LegendaryAopProcess.exe $(TargetDir)$(TargetFileName)" Importance="high" />
+		<Exec Command="$(TargetDir)LegendaryAopProcess.exe $(TargetDir)$(TargetFileName)"></Exec>
+		<Exec Command="$(TargetDir)LegendaryAopProcess.exe $(TargetDir)"></Exec>
+	</Target>
 </Project>

@@ -20,13 +20,16 @@ if (!fileInfo.Exists)
     return;
 }
 
+var rcfg = new ReaderParameters { ReadSymbols = true };
+var wcfg = new WriterParameters { WriteSymbols = true };
+
 Environment.CurrentDirectory = fileInfo.DirectoryName!;
 var assembly = Assembly.LoadFrom(fileInfo.Name);
 var assNames = assembly.GetReferencedAssemblies()
     .Select(a => new FileInfo($"{a.Name}.dll"))
     .Where(a => a.Exists)
-    .Select(a => new { reflection = Assembly.LoadFrom(a.Name), mono = AssemblyDefinition.ReadAssembly(a.Name) })
-    .Concat([new { reflection = assembly, mono = AssemblyDefinition.ReadAssembly(fileInfo.Name) }])
+    .Select(a => new { reflection = Assembly.LoadFrom(a.Name), mono = AssemblyDefinition.ReadAssembly(a.Name, rcfg) })
+    .Concat([new { reflection = assembly, mono = AssemblyDefinition.ReadAssembly(fileInfo.Name, rcfg) }])
     .SelectMany(a => a.reflection.Modules.Select(b => new { reflection = b, mono = a.mono.Modules.FirstOrDefault(c => c.Name == b.Name) }))
     .Where(a => a.mono != null)
     .SelectMany(a => a.reflection.GetTypes().Select(b => new { reflection = b, mono = a.mono!.Types.FirstOrDefault(c => c.FullName == b.FullName) }))
@@ -54,7 +57,7 @@ var assNames = assembly.GetReferencedAssemblies()
         {
             newFileInfo.Delete();
         }
-        ass.assMono.Write(newFileInfo.FullName);
+        ass.assMono.Write(newFileInfo.FullName, wcfg);
         return a.Key;
     }).ToList();
 return;
@@ -81,6 +84,9 @@ void processMethod(MethodDefinition originalMethod,MethodInfo method)
     foreach (var instruction in originalMethod.Body.Instructions)
     {
         ilProcessor.Append(instruction);
+
+        // 以下是调试符号
+        //foreach()
     }
 
     // 克隆原始方法的特性

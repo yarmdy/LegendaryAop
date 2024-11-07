@@ -1,7 +1,7 @@
 ﻿using LegendaryAop;
 using System.Diagnostics;
 
-await new MyClassAop().BarkAsync(4);
+new MyClassAop().Bark(4);
 
 public class XingnengAttribute : AsyncAopAttribute
 {
@@ -64,6 +64,10 @@ public class MyClassAop
     {
         var str = $"bark!{i}";
         Console.WriteLine(str);
+        if (i == 4)
+        {
+            Console.WriteLine("4");
+        }
         return str;
     }
     [Xingneng]
@@ -72,6 +76,10 @@ public class MyClassAop
     public async Task<string> BarkAsync(int i)
     {
         await barkTask();
+        if (i == 4)
+        {
+            Console.WriteLine("4");
+        }
         return "BarkAsync";
     }
     [Xingneng]
