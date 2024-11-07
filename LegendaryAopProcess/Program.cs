@@ -143,7 +143,7 @@ void processMethod(MethodDefinition originalMethod,MethodInfo method)
     }
     var funcRef = originalMethod.Module.ImportReference(funcType);
     var funcCon = originalMethod.Module.ImportReference(funcType.GetConstructors().First());
-
+    var objRef = originalMethod.Module.ImportReference(typeof(object));
 
     ilp.Append(ilp.Create(OpCodes.Newobj,execCon));
     ilp.Append(ilp.Create(OpCodes.Ldftn,clonedMethod));
@@ -153,6 +153,8 @@ void processMethod(MethodDefinition originalMethod,MethodInfo method)
     for (int i = 0; i < argCount; i++) {
         ilp.Append(ilp.Create(OpCodes.Ldarg, i));
     }
+    ilp.Append(ilp.Create(OpCodes.Newarr, objRef));
+
     ilp.Append(ilp.Create(OpCodes.Call, exec));
     ilp.Append(ilp.Create(OpCodes.Ret));
     
