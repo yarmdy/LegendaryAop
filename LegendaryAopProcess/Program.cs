@@ -150,9 +150,10 @@ void processMethod(MethodDefinition originalMethod,MethodInfo method)
     ilp.Append(ilp.Create(OpCodes.Newobj, funcCon));
 
     
-    for (int i = 0; i < argCount; i++) {
-        ilp.Append(ilp.Create(OpCodes.Ldarg, i));
-    }
+    //for (int i = method.IsStatic?0:1; i < argCount; i++) {
+    //    ilp.Append(ilp.Create(OpCodes.Ldarg, i));
+    //}
+    ilp.Append(ilp.Create(OpCodes.Ldc_I4, argCount));
     ilp.Append(ilp.Create(OpCodes.Newarr, objRef));
 
     ilp.Append(ilp.Create(OpCodes.Call, exec));
