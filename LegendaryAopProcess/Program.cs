@@ -1,6 +1,7 @@
 ﻿using LegendaryAop;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Collections.Immutable;
 using System.Reflection;
 
 const string _prefix_ = "LegendaryAopTemp_";
@@ -126,7 +127,20 @@ void processMethod(MethodDefinition originalMethod,MethodInfo method)
         exec = originalMethod.Module.ImportReference(execType.GetMethod("Exec", 1, [typeof(Delegate), typeof(object[])])!.MakeGenericMethod(method.ReturnType));
     }
     var argCount = originalMethod.Parameters.Count;
-    var funcType = Type.GetType($"System.Func`{argCount+1}")!;
+    var paramTypes = method.GetParameters().Select(a => a.ParameterType).ToList();
+    if (method.ReturnType != typeof(void))
+    {
+        paramTypes.Add(method.ReturnType);
+    }
+    var funcType = method.ReturnType==typeof(void)? Type.GetType($"System.Action`{paramTypes.Count}")!: Type.GetType($"System.Func`{paramTypes.Count}")!;
+    if (funcType == null)
+    {
+        funcType = typeof(Action);
+    }
+    if (paramTypes.Count > 0)
+    {
+        funcType = funcType.MakeGenericType(paramTypes.ToArray());
+    }
     var funcRef = originalMethod.Module.ImportReference(funcType);
     var funcCon = originalMethod.Module.ImportReference(funcType.GetConstructors().First());
 
