@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 var my = new MyClassAop();
 DefaultAopExecutor executor = new DefaultAopExecutor();
-var str = await executor.ExecAsync<string>(my.VoidAsync);
+var str = await executor.ExecAsync<string>(my.BarkAsync,0);
 
 Console.WriteLine(str);
 //my.Bark();

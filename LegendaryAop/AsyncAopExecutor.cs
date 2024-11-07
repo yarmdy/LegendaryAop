@@ -53,14 +53,14 @@ namespace LegendaryAop
                     return (object?)((dynamic)ret).Result;
                 });
             };
-            foreach (var aop in method.GetCustomAttributes<AsyncAopAttribute>().Select((a, i) => new { aop = a, index = i }).OrderByDescending(a => a.aop.Sort).ThenByDescending(a => a.index).Select(a => a.aop))
+            foreach (var aop in method.GetCustomAttributes().OfType<IAsyncAopAttribute>().Select((a, i) => new { aop = a, index = i }).OrderByDescending(a => a.aop.Sort).ThenByDescending(a => a.index).Select(a => a.aop))
             {
                 func = addFunc(method, func,aop);
             }
             return func;
         }
 
-        private Func<object?, object[], Task<object?>> addFunc(MethodInfo method ,Func<object?, object[], Task<object?>>  func,AsyncAopAttribute aop)
+        private Func<object?, object[], Task<object?>> addFunc(MethodInfo method ,Func<object?, object[], Task<object?>>  func,IAsyncAopAttribute aop)
         {
             return (obj,parameters) => {
                 return aop.InvokeAsync(new AopMetaData(method,obj,func, parameters));
