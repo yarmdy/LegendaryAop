@@ -83,16 +83,19 @@ public class FilterAttribute : AsyncAopAttribute
 }
 class CacheAttribute : AsyncAopAttribute
 {
-    static ConcurrentDictionary<int, Task<object?>> _dic = new();
+    static ConcurrentDictionary<object?, Task<object?>> _dic = new();
     public override string Name => "缓存";
 
     public override Task<object?> InvokeAsync(IAopMetaData data)
     {
-        int i = (int)data.Parameters[0];
+        if (data.Parameters.Length == 0)
+        {
+            return data.NextAsync();
+        }
         bool notfound = false;
-        var rest = _dic.GetOrAdd(i, async a => {
+        var rest = _dic.GetOrAdd(data.Parameters[0], o => {
             notfound = true;
-            return await data.NextAsync();
+            return data.NextAsync();
         });
         if (!notfound)
         {
