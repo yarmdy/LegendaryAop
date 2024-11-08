@@ -15,4 +15,14 @@
     <ProjectReference Include="..\LegendaryAop\LegendaryAop.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Include="build\LegendaryAopProcess.targets">
+			<Pack>true</Pack>
+			<PackagePath>build\</PackagePath>
+		</None>
+		<None Include="$(TargetDir)$(AssemblyName).runtimeconfig.json">
+			<Pack>true</Pack>
+			<PackagePath>tools\</PackagePath>
+		</None>
+	</ItemGroup>
 </Project>

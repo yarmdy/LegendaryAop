@@ -1,0 +1,12 @@
+<Project>
+  <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
+  <Target Name="aop" AfterTargets="Build">
+		<Message Text="开始aop织入" Importance="high" />
+		<Exec Command="dotnet $(TargetDir)LegendaryAopProcess.dll $(TargetDir)$(TargetFileName)"></Exec>
+		<Message Text="开始aop覆盖" Importance="high" />
+		<Exec Command="dotnet $(TargetDir)LegendaryAopProcess.dll $(TargetDir)"></Exec>
+		<Message Text="aop成功" Importance="high" />
+		<Message Text="开始删除文件" Importance="high" />
+		<Delete Files="$(OutputPath)LegendaryAopProcess.dll;$(OutputPath)LegendaryAopProcess.runtimeconfig.json;$(OutputPath)Mono.Cecil.dll;$(OutputPath)Mono.Cecil.Mdb.dll;$(OutputPath)Mono.Cecil.Pdb.dll;$(OutputPath)Mono.Cecil.Rocks.dll" />
+	</Target>
+</Project>
