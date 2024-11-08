@@ -23,7 +23,7 @@ namespace LegendaryAop
 
         public Task<T?> ExecAsync<T>(Delegate method, params object[] parameters)
         {
-            var func = _cacheFunc.GetOrAdd(method.Method, createFunc);
+            var func = _cacheFunc.GetOrAdd(method.Method, createFunc<T>);
             return func(method.Target, parameters).ContinueWith(a =>
             {
                 if (a.Result == null)
@@ -33,7 +33,7 @@ namespace LegendaryAop
                 return (T)a.Result;
             });
         }
-        private Func<object?, object[], Task<object?>> createFunc(MethodInfo method)
+        private Func<object?, object[], Task<object?>> createFunc<T>(MethodInfo method)
         {
             Func<object?, object[], Task<object?>> func = (obj,data) =>
             {
@@ -47,7 +47,7 @@ namespace LegendaryAop
                     {
                         return null;
                     }
-                    return (object?)((dynamic)ret).Result;
+                    return (object?)((Task<T>)ret).Result;
                 });
             };
             foreach (var aop in method.GetCustomAttributes().OfType<IAsyncAopAttribute>().Select((a, i) => new { aop = a, index = i }).OrderByDescending(a => a.aop.Sort).ThenByDescending(a => a.index).Select(a => a.aop))
