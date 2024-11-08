@@ -10,6 +10,10 @@
   <ItemGroup>
     <ProjectReference Include="..\LegendaryAopProcess\LegendaryAopProcess.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 	<Target Name="aop" AfterTargets="Build">
 		<Message Text="开始aop织入" Importance="high" />
 		<Exec Command="$(TargetDir)LegendaryAopProcess.exe $(TargetDir)$(TargetFileName)"></Exec>

@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Reflection;
 
 const string _prefix_ = "LegendaryAopTemp_";
+HashSet<string> myNames= new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { "LegendaryAop", "LegendaryAopProcess" };
 if (args.Length < 1)
 {
     return;
@@ -26,6 +27,7 @@ var wcfg = new WriterParameters { WriteSymbols = true };
 Environment.CurrentDirectory = fileInfo.DirectoryName!;
 var assembly = Assembly.LoadFrom(fileInfo.Name);
 var assNames = assembly.GetReferencedAssemblies()
+    .Where(a=> !myNames.Contains(a.Name!))
     .Select(a => new FileInfo($"{a.Name}.dll"))
     .Where(a => a.Exists)
     .Select(a => new { reflection = Assembly.LoadFrom(a.Name), mono = AssemblyDefinition.ReadAssembly(a.Name, rcfg) })

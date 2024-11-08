@@ -20,7 +20,7 @@
 			<Pack>true</Pack>
 			<PackagePath>build\</PackagePath>
 		</None>
-		<None Include="$(TargetDir)$(AssemblyName).runtimeconfig.json">
+		<None Update="$(TargetDir)$(AssemblyName).runtimeconfig.json">
 			<Pack>true</Pack>
 			<PackagePath>content\</PackagePath>
 		</None>
