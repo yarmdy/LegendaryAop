@@ -1,7 +1,20 @@
 ﻿using LegendaryAop;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
-await new MyClassAop().BarkAsync(4);
+var aop = new MyClassAop();
+var str = "";
+do
+{
+    Console.WriteLine("请输入数字：");
+    str = Console.ReadLine();
+    if (!int.TryParse(str,out int key))
+    {
+        continue;
+    }
+    Console.WriteLine($"{key}的结果是:{await aop.GetValue(key)}");
+    Console.WriteLine();
+} while (str != "exit");
 
 public class XingnengAttribute : AsyncAopAttribute
 {
@@ -63,6 +76,26 @@ public class FilterAttribute : AsyncAopAttribute
         return result;
     }
 }
+class CacheAttribute : AsyncAopAttribute
+{
+    static ConcurrentDictionary<int, Task<object?>> _dic = new();
+    public override string Name => "缓存";
+
+    public override Task<object?> InvokeAsync(IAopMetaData data)
+    {
+        int i = (int)data.Parameters[0];
+        bool notfound = false;
+        var rest = _dic.GetOrAdd(i, async a => {
+            notfound = true;
+            return await data.NextAsync();
+        });
+        if (!notfound)
+        {
+            Console.WriteLine("恭喜：发现缓存^_^");
+        }
+        return rest;
+    }
+}
 public class MyClassAop
 {
     [Xingneng]
@@ -122,5 +155,13 @@ public class MyClassAop
     public static string Bark2(int i)
     {
         return new DefaultAopExecutor().Exec<string>(Barks, i)!;
+    }
+    [Cache]
+    [Log]
+    [Xingneng]
+    public async Task<int> GetValue(int key)
+    {
+        await Task.Delay(1000);
+        return key * 2 - 10;
     }
 }
