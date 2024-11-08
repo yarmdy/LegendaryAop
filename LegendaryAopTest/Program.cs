@@ -8,6 +8,11 @@ do
 {
     Console.WriteLine("请输入数字：");
     str = Console.ReadLine();
+    if (str=="cls")
+    {
+        Console.Clear();
+        continue;
+    }
     if (!int.TryParse(str,out int key))
     {
         continue;
