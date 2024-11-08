@@ -22,7 +22,7 @@
 		</None>
 		<None Include="$(TargetDir)$(AssemblyName).runtimeconfig.json">
 			<Pack>true</Pack>
-			<PackagePath>tools\</PackagePath>
+			<PackagePath>content\</PackagePath>
 		</None>
 	</ItemGroup>
 </Project>

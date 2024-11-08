@@ -1,6 +1,10 @@
 <Project>
   <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
-  <Target Name="aop" AfterTargets="Build">
+	<Target Name="aop" AfterTargets="Build">
+		<ItemGroup>
+			<ContentFiles Include="$(MSBuildThisFileDirectory)..\content\*" />
+		</ItemGroup>
+		<Copy SourceFiles="$(ContentFiles)" DestinationFiles="$(TargetDir)"></Copy>
 		<Message Text="开始aop织入" Importance="high" />
 		<Exec Command="dotnet $(TargetDir)LegendaryAopProcess.dll $(TargetDir)$(TargetFileName)"></Exec>
 		<Message Text="开始aop覆盖" Importance="high" />
