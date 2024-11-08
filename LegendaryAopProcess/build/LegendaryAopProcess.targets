@@ -4,7 +4,7 @@
 		<ItemGroup>
 			<ContentFiles Include="$(MSBuildThisFileDirectory)..\content\*" />
 		</ItemGroup>
-		<Copy SourceFiles="$(ContentFiles)" DestinationFiles="$(TargetDir)"></Copy>
+		<Copy SourceFiles="@(ContentFiles)" DestinationFolder="$(TargetDir)"></Copy>
 		<Message Text="开始aop织入" Importance="high" />
 		<Exec Command="dotnet $(TargetDir)LegendaryAopProcess.dll $(TargetDir)$(TargetFileName)"></Exec>
 		<Message Text="开始aop覆盖" Importance="high" />
