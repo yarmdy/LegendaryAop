@@ -24,13 +24,13 @@ namespace LegendaryAop
         public Task<T?> ExecAsync<T>(Delegate method, params object[] parameters)
         {
             var func = _cacheFunc.GetOrAdd(method.Method, createFunc);
-            return Task.Run(async () => {
-                var result = await func(method.Target,parameters);
-                if (result == null)
+            return func(method.Target, parameters).ContinueWith(a =>
+            {
+                if (a.Result == null)
                 {
                     return default;
                 }
-                return (T)result;
+                return (T)a.Result;
             });
         }
         private Func<object?, object[], Task<object?>> createFunc(MethodInfo method)
@@ -42,11 +42,8 @@ namespace LegendaryAop
                 {
                     return Task.FromResult(ret);
                 }
-                
-                return Task.Run(async () =>
-                {
-                    await task;
-                    if(!method.ReturnType.IsConstructedGenericType)
+                return task.ContinueWith(a => {
+                    if (!method.ReturnType.IsConstructedGenericType)
                     {
                         return null;
                     }
