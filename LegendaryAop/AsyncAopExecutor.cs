@@ -8,12 +8,12 @@ namespace LegendaryAop
         private static ConcurrentDictionary<MethodInfo, Func<object?, object[], Task<object?>>> _cacheFunc = new();
         public T? Exec<T>(Delegate method, params object[] parameters)
         {
-            var result = Task.Run(async () => await ExecAsync<T>(method, parameters)).Result;
-            if (result == null)
+            var task = ExecAsync<T>(method, parameters);
+            if (SynchronizationContext.Current == null)
             {
-                return default;
+                return task.Result;
             }
-            return result;
+            return Task.Run(async () => await task).Result;
         }
 
         public void Exec(Delegate method, params object[] parameters)
