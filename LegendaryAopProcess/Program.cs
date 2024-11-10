@@ -165,11 +165,12 @@ void processMethod(MethodDefinition originalMethod,Assembly ass)
         {
             funcType = typeof(Action);
         }
-        var funcRef = originalMethod.Module.ImportReference(funcType);
+        var funcRef = (TypeReference)originalMethod.Module.ImportReference(funcType).Resolve();
         if (paramTypes.Count > 0)
         {
             funcRef = funcRef.MakeGenericInstanceType(paramTypes.ToArray());
         }
+        
         var cons = funcRef.Resolve().GetConstructors();
         var funcCon = originalMethod.Module.ImportReference(cons.First());
 

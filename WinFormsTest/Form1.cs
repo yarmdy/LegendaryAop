@@ -11,7 +11,8 @@ namespace WinFormsTest
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            var asd = Log("的方法 ").Result;
+            Log("的方法 ");
+            new DefaultAopExecutor().ExecAsync(Log,"你好");
         }
         [Log]
         public Task<int> Log(string str)
