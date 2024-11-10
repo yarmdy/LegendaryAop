@@ -1,4 +1,5 @@
 using LegendaryAop;
+using System.Diagnostics;
 
 namespace WinFormsTest
 {
@@ -9,16 +10,19 @@ namespace WinFormsTest
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
-            Log("的方法 ");
-            new DefaultAopExecutor().ExecAsync(Log,"你好");
         }
-        [Log]
+        
         public Task<int> Log(string str)
         {
-            Console.WriteLine(str);
+            Debug.WriteLine(str);
             return Task.FromResult(str.GetHashCode());
+        }
+        [Log]
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            await Log("按按钮了");
         }
     }
     public class LogAttribute : AsyncAopAttribute
@@ -27,7 +31,10 @@ namespace WinFormsTest
 
         public override async Task<object?> InvokeAsync(IAopMetaData data)
         {
-            return await data.NextAsync();
+            Debug.WriteLine("记录日志");
+            var ret = await data.NextAsync();
+            Debug.WriteLine("记录日志后");
+            return ret;
         }
     }
 }

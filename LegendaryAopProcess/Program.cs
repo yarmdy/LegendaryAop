@@ -140,11 +140,11 @@ void processMethod(MethodDefinition originalMethod,Assembly ass)
         {
             exec = originalMethod.Module.ImportReference(execType.GetMethod("ExecAsync", 0, [typeof(Delegate), typeof(object[])]));
         }
-        else if (originalMethod.ReturnType.HasGenericParameters && originalMethod.ReturnType.Resolve().BaseType.FullName == taskRef.FullName)
+        else if (originalMethod.ReturnType.IsGenericInstance && originalMethod.ReturnType.Resolve().BaseType.FullName == taskRef.FullName)
         {
             var genMethod = originalMethod.Module.ImportReference(execType.GetMethod("ExecAsync", 1, [typeof(Delegate), typeof(object[])])!);
             var genInsMethod = new GenericInstanceMethod(genMethod);
-            genInsMethod.GenericArguments.Add(originalMethod.ReturnType);
+            genInsMethod.GenericArguments.Add(((GenericInstanceType)originalMethod.ReturnType).GenericArguments[0]);
             exec = genInsMethod;
         }
         else if (originalMethod.ReturnType.FullName != voidRef.FullName)
@@ -172,6 +172,7 @@ void processMethod(MethodDefinition originalMethod,Assembly ass)
         {
             funcRef = funcRef.MakeGenericInstanceType(paramTypes.ToArray());
             con = new MethodReference(".ctor",voidRef, funcRef);
+            con.HasThis = true;
             con.Parameters.Add(new ParameterDefinition(objRef));
             con.Parameters.Add(new ParameterDefinition(nintRef));
         }

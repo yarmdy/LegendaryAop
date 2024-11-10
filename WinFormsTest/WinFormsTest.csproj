@@ -7,14 +7,15 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-	<!--<Target Name="aop" AfterTargets="Build">
+	<Target Name="aop" AfterTargets="Build">
 		<Message Text="开始aop织入" Importance="high" />
 		<Exec Command="$(TargetDir)LegendaryAopProcess.exe $(TargetDir)$(TargetFileName)"></Exec>
 		<Message Text="开始aop覆盖" Importance="high" />
 		<Exec Command="$(TargetDir)LegendaryAopProcess.exe $(TargetDir)"></Exec>
 		<Message Text="aop成功" Importance="high" />
-	</Target>-->
+	</Target>
 	<ItemGroup>
 	  <ProjectReference Include="..\LegendaryAopProcess\LegendaryAopProcess.csproj" />
+	  <ProjectReference Include="..\LegendaryAop\LegendaryAop.csproj" />
 	</ItemGroup>
 </Project>
