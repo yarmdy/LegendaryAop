@@ -165,14 +165,19 @@ void processMethod(MethodDefinition originalMethod,Assembly ass)
         {
             funcType = typeof(Action);
         }
-        var funcRef = (TypeReference)originalMethod.Module.ImportReference(funcType).Resolve();
+        var funcRef = originalMethod.Module.ImportReference(funcType);
+        var cons = funcRef.Resolve().GetConstructors();
+        MethodReference con = cons.First();
         if (paramTypes.Count > 0)
         {
             funcRef = funcRef.MakeGenericInstanceType(paramTypes.ToArray());
+            con = new MethodReference(".ctor",voidRef, funcRef);
+            con.Parameters.Add(new ParameterDefinition(objRef));
+            con.Parameters.Add(new ParameterDefinition(nintRef));
         }
         
-        var cons = funcRef.Resolve().GetConstructors();
-        var funcCon = originalMethod.Module.ImportReference(cons.First());
+        
+        var funcCon = originalMethod.Module.ImportReference(con);
 
         ilp.Append(ilp.Create(OpCodes.Newobj, execCon));
         if (originalMethod.IsStatic)
