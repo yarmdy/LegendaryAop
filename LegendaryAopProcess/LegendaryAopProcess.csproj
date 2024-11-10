@@ -20,9 +20,13 @@
 			<Pack>true</Pack>
 			<PackagePath>build\</PackagePath>
 		</None>
-		<None Update="$(TargetDir)$(AssemblyName).runtimeconfig.json">
+		<None Update="content\LegendaryAopProcess.runtimeconfig.json">
 			<Pack>true</Pack>
-			<PackagePath>content\</PackagePath>
+			<PackagePath></PackagePath>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="content\" />
 	</ItemGroup>
 </Project>
