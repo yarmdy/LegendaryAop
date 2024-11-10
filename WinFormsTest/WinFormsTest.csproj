@@ -8,7 +8,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="LegendaryAopProcess" Version="1.0.0" />
-  </ItemGroup>
+  
+	<Target Name="aop" AfterTargets="Build">
+		<Message Text="开始aop织入" Importance="high" />
+		<Exec Command="$(TargetDir)LegendaryAopProcess.exe $(TargetDir)$(TargetFileName)"></Exec>
+		<Message Text="开始aop覆盖" Importance="high" />
+		<Exec Command="$(TargetDir)LegendaryAopProcess.exe $(TargetDir)"></Exec>
+		<Message Text="aop成功" Importance="high" />
+	</Target>
+
+  
+	<ItemGroup>
+	  <ProjectReference Include="..\LegendaryAopProcess\LegendaryAopProcess.csproj" />
+	</ItemGroup>
 </Project>
