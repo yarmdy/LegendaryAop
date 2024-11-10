@@ -41,8 +41,8 @@ var assNames = assembly.GetReferencedAssemblies()
     .SelectMany(a => a.Mono.Methods.Select(b => new { a.ass, mono = b }))
     .Where(a => a.mono != null)
     .Select(a => new { ass = a.ass, methodMono = a.mono, aops = a.mono.CustomAttributes.Select(b => b.AttributeType).Where(IsInterface) })
-    .Where(a => a.aops.Any())
-    .Select(item =>
+    .Where(a => a.aops.Any()).ToList();
+assNames.Select(item =>
     {
         var methodMono = item.methodMono!;
         var ass = item.ass;
@@ -131,6 +131,8 @@ void processMethod(MethodDefinition originalMethod,Assembly ass)
         var execCon = originalMethod.Module.ImportReference(execType.GetConstructor([]));
         var taskRef = originalMethod.Module.ImportReference(typeof(Task));
         var voidRef = originalMethod.Module.ImportReference(typeof(void));
+        var objRef = originalMethod.Module.ImportReference(typeof(object));
+        var nintRef = originalMethod.Module.ImportReference(typeof(nint));
 
         MethodReference exec = originalMethod.Module.ImportReference(execType.GetMethod("Exec", 0, [typeof(Delegate), typeof(object[])]));
 
@@ -163,14 +165,13 @@ void processMethod(MethodDefinition originalMethod,Assembly ass)
         {
             funcType = typeof(Action);
         }
-        var funcTypeRef = originalMethod.Module.ImportReference(funcType);
+        var funcRef = originalMethod.Module.ImportReference(funcType);
         if (paramTypes.Count > 0)
         {
-            funcTypeRef = funcTypeRef.MakeGenericInstanceType(paramTypes.ToArray());
+            funcRef = funcRef.MakeGenericInstanceType(paramTypes.ToArray());
         }
-        var funcRef = originalMethod.Module.ImportReference(funcType);
-        var funcCon = originalMethod.Module.ImportReference(funcType.GetConstructor([typeof(object), typeof(nint)]));
-        var objRef = originalMethod.Module.ImportReference(typeof(object));
+        var cons = funcRef.Resolve().GetConstructors();
+        var funcCon = originalMethod.Module.ImportReference(cons.First());
 
         ilp.Append(ilp.Create(OpCodes.Newobj, execCon));
         if (originalMethod.IsStatic)

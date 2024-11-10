@@ -11,7 +11,7 @@ namespace WinFormsTest
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            var asd = Log("µÄ·½·¨ ").Result;
         }
         [Log]
         public Task<int> Log(string str)
