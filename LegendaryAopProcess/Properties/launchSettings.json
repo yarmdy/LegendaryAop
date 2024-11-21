@@ -2,7 +2,7 @@
   "profiles": {
     "LegendaryAopProcess": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\Projects\\dotnet\\LegendaryAop\\WinFormsTest\\bin\\Debug\\net8.0-windows\\WinFormsTest.dll"
+      "commandLineArgs": "C:\\Users\\Encompass\\source\\repos\\TestBackground\\TestBackground\\bin\\Debug\\net8.0\\TestBackground.dll"
     }
   }
 }

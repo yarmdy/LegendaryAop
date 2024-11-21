@@ -32,7 +32,14 @@ var assNames = assembly.GetReferencedAssemblies()
     .Where(a => !myNames.Contains(a.Name!))
     .Select(a => new FileInfo($"{a.Name}.dll"))
     .Where(a => a.Exists)
-    .Select(a => new { ass = Assembly.LoadFrom(a.FullName), mono = AssemblyDefinition.ReadAssembly(a.Name, rcfg) })
+    .Select(a => {
+        var pdbFile = new FileInfo(a.FullName.Substring(0, a.FullName.Length - a.Extension.Length) + ".pdb");
+        if (pdbFile.Exists)
+        {
+            return new { ass = Assembly.LoadFrom(a.FullName), mono = AssemblyDefinition.ReadAssembly(a.Name, rcfg) };
+        }
+        return new { ass = Assembly.LoadFrom(a.FullName), mono = AssemblyDefinition.ReadAssembly(a.Name) };
+    })
     .Concat([new { ass = assembly, mono = AssemblyDefinition.ReadAssembly(fileInfo.Name, rcfg) }])
     .SelectMany(a => a.mono.Modules.Select(b => new { a.ass, mono = b }))
     .Where(a => a.mono != null)
@@ -233,7 +240,16 @@ bool IsInterface(TypeReference type)
     var stack = new Stack<TypeReference>([type]);
     while (stack.Count > 0) { 
         var tref = stack.Pop();
-        var tdef = tref.Resolve();
+        TypeDefinition tdef;
+        try
+        {
+            tdef = tref.Resolve();
+        }catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+            continue;
+        }
+        
         if (tdef.Interfaces.Any(a => a.InterfaceType.FullName == i.FullName))
         {
             return true;
