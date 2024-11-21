@@ -128,7 +128,7 @@ void processMethod(MethodDefinition originalMethod,Assembly ass)
         clonedMethod.Attributes |= Mono.Cecil.MethodAttributes.SpecialName;
 
 
-        originalMethod.CustomAttributes.Clear();
+        //originalMethod.CustomAttributes.Clear();
 
         originalMethod.Body.Instructions.Clear();
         var ilp = originalMethod.Body.GetILProcessor();
