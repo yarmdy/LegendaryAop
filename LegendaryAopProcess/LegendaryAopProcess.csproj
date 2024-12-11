@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<Version>1.0.0.2</Version>
+	<Version>1.0.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,13 +21,17 @@
 			<Pack>true</Pack>
 			<PackagePath>build\</PackagePath>
 		</None>
-		<None Update="content\LegendaryAopProcess.runtimeconfig.json">
+		<None Include="build\net6.0.targets">
 			<Pack>true</Pack>
-			<PackagePath></PackagePath>
+			<PackagePath>build\</PackagePath>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="content\" />
+		<None Include="build\net7.0.targets">
+			<Pack>true</Pack>
+			<PackagePath>build\</PackagePath>
+		</None>
+		<None Include="build\net8.0.targets">
+			<Pack>true</Pack>
+			<PackagePath>build\</PackagePath>
+		</None>
 	</ItemGroup>
 </Project>

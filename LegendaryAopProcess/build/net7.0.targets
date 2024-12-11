@@ -2,7 +2,7 @@
   <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
 	<Target Name="aop" AfterTargets="Build">
 		<ItemGroup>
-			<ContentFiles Include="$(MSBuildThisFileDirectory)..\lib\net8.0\*" />
+			<ContentFiles Include="$(MSBuildThisFileDirectory)..\lib\net7.0\*" />
 		</ItemGroup>
 		<Copy SourceFiles="@(ContentFiles)" DestinationFolder="$(TargetDir)"></Copy>
 		<Message Text="开始aop织入" Importance="high" />
