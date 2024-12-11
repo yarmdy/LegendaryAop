@@ -40,7 +40,7 @@ var assNames = assembly.GetReferencedAssemblies()
         }
         return new { ass = Assembly.LoadFrom(a.FullName), mono = AssemblyDefinition.ReadAssembly(a.Name) };
     })
-    .Concat([new { ass = assembly, mono = AssemblyDefinition.ReadAssembly(fileInfo.Name, rcfg) }])
+    .Concat(new[] { new { ass = assembly, mono = AssemblyDefinition.ReadAssembly(fileInfo.Name, rcfg) } })
     .SelectMany(a => a.mono.Modules.Select(b => new { a.ass, mono = b }))
     .Where(a => a.mono != null)
     .SelectMany(a => a.mono.Types.Select(b => new { a.ass, Mono = b }))
@@ -135,28 +135,28 @@ void processMethod(MethodDefinition originalMethod,Assembly ass)
         //开始
         var execType = typeof(DefaultAopExecutor);
         var execRef = originalMethod.Module.ImportReference(execType);
-        var execCon = originalMethod.Module.ImportReference(execType.GetConstructor([]));
+        var execCon = originalMethod.Module.ImportReference(execType.GetConstructor(Array.Empty<Type>()));
         var taskRef = originalMethod.Module.ImportReference(typeof(Task));
         var voidRef = originalMethod.Module.ImportReference(typeof(void));
         var objRef = originalMethod.Module.ImportReference(typeof(object));
         var nintRef = originalMethod.Module.ImportReference(typeof(nint));
 
-        MethodReference exec = originalMethod.Module.ImportReference(execType.GetMethod("Exec", 0, [typeof(Delegate), typeof(object[])]));
+        MethodReference exec = originalMethod.Module.ImportReference(execType.GetMethod("Exec", 0, new[] { typeof(Delegate), typeof(object[]) }));
 
         if (originalMethod.ReturnType.FullName == taskRef.FullName)
         {
-            exec = originalMethod.Module.ImportReference(execType.GetMethod("ExecAsync", 0, [typeof(Delegate), typeof(object[])]));
+            exec = originalMethod.Module.ImportReference(execType.GetMethod("ExecAsync", 0, new[] { typeof(Delegate), typeof(object[]) }));
         }
         else if (originalMethod.ReturnType.IsGenericInstance && originalMethod.ReturnType.Resolve().BaseType.FullName == taskRef.FullName)
         {
-            var genMethod = originalMethod.Module.ImportReference(execType.GetMethod("ExecAsync", 1, [typeof(Delegate), typeof(object[])])!);
+            var genMethod = originalMethod.Module.ImportReference(execType.GetMethod("ExecAsync", 1, new[] { typeof(Delegate), typeof(object[]) })!);
             var genInsMethod = new GenericInstanceMethod(genMethod);
             genInsMethod.GenericArguments.Add(((GenericInstanceType)originalMethod.ReturnType).GenericArguments[0]);
             exec = genInsMethod;
         }
         else if (originalMethod.ReturnType.FullName != voidRef.FullName)
         {
-            var genMethod = originalMethod.Module.ImportReference(execType.GetMethod("Exec", 1, [typeof(Delegate), typeof(object[])])!);
+            var genMethod = originalMethod.Module.ImportReference(execType.GetMethod("Exec", 1, new[] { typeof(Delegate), typeof(object[]) })!);
             var genInsMethod = new GenericInstanceMethod(genMethod);
             genInsMethod.GenericArguments.Add(originalMethod.ReturnType);
             exec = genInsMethod;
@@ -237,7 +237,7 @@ bool IsInterface(TypeReference type)
 {
     var i = type.Module.ImportReference(typeof(IAsyncAopAttribute));
     var a = type.Module.ImportReference(typeof(Attribute));
-    var stack = new Stack<TypeReference>([type]);
+    var stack = new Stack<TypeReference>(new[] { type });
     while (stack.Count > 0) { 
         var tref = stack.Pop();
         TypeDefinition tdef;
