@@ -1,4 +1,5 @@
-﻿namespace LegendaryAop
+﻿using System.Threading.Tasks;
+namespace LegendaryAop
 {
     public interface IAsyncAopAttribute
     {
