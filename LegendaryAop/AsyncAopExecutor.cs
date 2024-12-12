@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -9,6 +11,10 @@ namespace LegendaryAop
 {
     public class DefaultAopExecutor : IAsyncAopExecutor, IAopExecutor, IVoidAopExecutor, IAsyncVoidAopExecutor
     {
+        MethodInfo caller;
+        public DefaultAopExecutor() {
+            caller = (new StackTrace().GetFrame(1)!.GetMethod() as MethodInfo)!;
+        }
         private static ConcurrentDictionary<MethodInfo, Func<object?, object[], Task<object?>>> _cacheFunc = new();
         public T? Exec<T>(Delegate method, params object[] parameters)
         {
@@ -56,15 +62,15 @@ namespace LegendaryAop
             };
             foreach (var aop in method.GetCustomAttributes().OfType<IAsyncAopAttribute>().Select((a, i) => new { aop = a, index = i }).OrderByDescending(a => a.aop.Sort).ThenByDescending(a => a.index).Select(a => a.aop))
             {
-                func = addFunc(method, func,aop);
+                func = addFunc(func,aop);
             }
             return func;
         }
 
-        private Func<object?, object[], Task<object?>> addFunc(MethodInfo method ,Func<object?, object[], Task<object?>>  func,IAsyncAopAttribute aop)
+        private Func<object?, object[], Task<object?>> addFunc(Func<object?, object[], Task<object?>>  func,IAsyncAopAttribute aop)
         {
             return (obj,parameters) => {
-                return aop.InvokeAsync(new AopMetaData(method,obj,func, parameters));
+                return aop.InvokeAsync(new AopMetaData(caller, obj,func, parameters));
             };
         }
 
